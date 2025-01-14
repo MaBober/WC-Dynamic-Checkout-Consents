@@ -1,0 +1,1 @@
+# WooCommerce-Dynamic-Checkout-Consents
