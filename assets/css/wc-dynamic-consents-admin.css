@@ -1,0 +1,26 @@
+.full-width-textarea {
+    width: 100%;
+    margin: 5px 0;
+}
+
+.consent-conditions {
+    margin-bottom: 10px;
+}
+
+.consent-condition {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.consent-type,
+.consent-target {
+    width: 45%;
+}
+
+.remove-consent,
+.remove-condition {
+    background-color: #dc3232;
+    color: #fff;
+}
