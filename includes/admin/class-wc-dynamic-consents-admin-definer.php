@@ -4,24 +4,47 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-class WC_Dynamic_Consents_Admin {
+/**
+ * Class WC_Dynamic_Consents_Definer
+ *
+ * Handles the definition and management of dynamic consents in the WooCommerce admin.
+ */
+class WC_Dynamic_Consents_Definer {
+
+    /**
+     * WC_Dynamic_Consents_Definer constructor.
+     */
     public function __construct() {
         $this->init_hooks();
-        // add_action('admin_init', array($this, 'admin_page_init'));
-        
+        add_filter('woocommerce_admin_settings_sanitize_option', function() {
+            error_log('Sanitizing dynamic consents settings CONSTRUCTOR');
+        }, 10, 3);
     }
 
+    /**
+     * Initialize hooks.
+     */
     public function init_hooks() {
-
+        add_action('woocommerce_settings_save_account', function() {
+            error_log('🚀 WooCommerce zapisuje ustawienia "Account"!');
+        });
         add_filter('woocommerce_get_settings_account', [$this, 'add_dynamic_consent_settings_to_checkout']);
         add_action('woocommerce_admin_field_consents_table', [$this, 'render_dynamic_consents_table']);
+        error_log('Adding dynamic consents table hook');
+        add_filter('woocommerce_admin_settings_sanitize_option', function() {
+            error_log('Sanitizing dynamic consents settings');
+        }, 10, 3);
+
         add_filter('woocommerce_admin_settings_sanitize_option', [$this, 'save_dynamic_consents_settings'], 10, 3);
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
-        add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'display_order_consents']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
     }
 
+    /**
+     * Enqueue admin assets.
+     *
+     * @param string $hook The current admin page.
+     */
     public function enqueue_admin_assets($hook) {
-
         if ($hook !== 'woocommerce_page_wc-settings') {
             return;
         }
@@ -40,11 +63,12 @@ class WC_Dynamic_Consents_Admin {
             '1.0.0',
             true
         );
-        // Pobranie listy kategorii i produktów
+
+        // Get list of categories and products
         $categories = get_terms(['taxonomy' => 'product_cat', 'hide_empty' => false]);
         $products = wc_get_products(['limit' => -1]);
 
-        // Przygotowanie danych dla JavaScript
+        // Prepare data for JavaScript
         $localized_data = [
             'categories' => [],
             'products'   => [],
@@ -64,11 +88,9 @@ class WC_Dynamic_Consents_Admin {
             ];
         }
 
-        // Przekazanie danych do JS
+        // Pass data to JS
         wp_localize_script('wc-dynamic-consents-admin-js', 'wcDynamicConsentsData', $localized_data);
-
     }
-    
 
     /**
      * Adds dynamic consent settings to the WooCommerce checkout settings.
@@ -81,34 +103,40 @@ class WC_Dynamic_Consents_Admin {
      * @return array The modified settings with the added dynamic consent options.
      */
     public function add_dynamic_consent_settings_to_checkout($settings) {
-        $custom_settings = array(
-            array(
+        $custom_settings = [
+            [
                 'title' => __('Additional consents', 'woocommerce'),
-                'type' => 'title',
-                'id' => 'dynamic_consents_options',
-            ),
-            array(
+                'type'  => 'title',
+                'id'    => 'dynamic_consents_options',
+            ],
+            [
                 'type' => 'consents_table',
-                'id' => 'dynamic_consents',
+                'id'   => 'dynamic_consents',
                 'desc' => __('Define the consents you want customers to accept. Use the "Add Consent" button to add more.', 'woocommerce'),
-            ),
-            array(
+            ],
+            [
                 'type' => 'sectionend',
-                'id' => 'dynamic_consents_options',
-            ),
-        );
-    
+                'id'   => 'dynamic_consents_options',
+            ],
+        ];
+        error_log('📌 Rejestrowane ustawienia WooCommerce: ' . print_r($custom_settings, true));
+
         return array_merge($settings, $custom_settings);
     }
 
+    /**
+     * Render the dynamic consents table.
+     *
+     * @param array $value The field value.
+     */
     public function render_dynamic_consents_table($value) {
-
+        error_log('Rendering dynamic consents table');
         $saved_consents = get_option($value['id'], []);
         if (!is_array($saved_consents)) {
             $saved_consents = [];
         }
     
-        // Pobieramy listę kategorii i produktów WooCommerce
+        // Get list of categories and products
         $categories = get_terms(['taxonomy' => 'product_cat', 'hide_empty' => false]);
         $products = wc_get_products(['limit' => -1]);
     
@@ -132,7 +160,7 @@ class WC_Dynamic_Consents_Admin {
     
         <button type="button" class="button add-consent"><?php esc_html_e('Add New Consent', 'wc-dynamic-consents'); ?></button>
     
-        <!-- 🔹 Ukryty szablon wiersza tabeli -->
+        <!-- Hidden row template -->
         <template id="consent-row-template">
             <?php $this->render_consent_row('__INDEX__', [], $categories, $products); ?>
         </template>
@@ -141,9 +169,14 @@ class WC_Dynamic_Consents_Admin {
         </template>
         <?php
     }
-    
+
     /**
-     * Renderowanie pojedynczego wiersza tabeli
+     * Render a single consent row.
+     *
+     * @param int $index The index of the consent.
+     * @param array $consent The consent data.
+     * @param array $categories The list of categories.
+     * @param array $products The list of products.
      */
     private function render_consent_row($index, $consent, $categories, $products) {
         ?>
@@ -176,12 +209,20 @@ class WC_Dynamic_Consents_Admin {
         </tr>
         <?php
     }
-    
+
     /**
-     * Renderuje pojedynczy warunek w sekcji "Include In"
+     * Render a single condition row in the "Include In" section.
+     *
+     * @param int $consent_index The index of the consent.
+     * @param int $condition_index The index of the condition.
+     * @param array $condition The condition data.
+     * @param array $categories The list of categories.
+     * @param array $products The list of products.
      */
     private function render_condition_row($consent_index, $condition_index, $condition, $categories, $products) {
+        error_log('Rendering condition row');
         ?>
+
         <div class="consent-condition">
             <select name="dynamic_consents[<?php echo esc_attr($consent_index); ?>][conditions][<?php echo esc_attr($condition_index); ?>][type]" class="consent-type">
                 <option value="category" <?php selected($condition['type'] ?? '', 'category'); ?>><?php esc_html_e('Category', 'wc-dynamic-consents'); ?></option>
@@ -195,7 +236,16 @@ class WC_Dynamic_Consents_Admin {
         <?php
     }
 
+    /**
+     * Save dynamic consents settings.
+     *
+     * @param mixed $value The sanitized option value.
+     * @param array $option The option array.
+     * @param mixed $raw_value The raw option value.
+     * @return mixed The sanitized option value.
+     */
     public function save_dynamic_consents_settings($value, $option, $raw_value) {
+        error_log('Saving dynamic consents settings');
         if ($option['id'] === 'dynamic_consents') {
             foreach ($raw_value as &$consent) {
                 if (isset($consent['text'])) {
@@ -207,26 +257,4 @@ class WC_Dynamic_Consents_Admin {
         }
         return $value;
     }
-
-    public function display_order_consents($order) {
-        $consents = get_post_meta($order->get_id(), '_dynamic_consents', true);
-    
-        if (!empty($consents)) {
-            echo '<p><strong>' . esc_html__('Consents Given:', 'wc-dynamic-consents') . '</strong></p>';
-            echo '<ul>';
-            foreach ($consents as $consent) {
-                // Usuwamy znaczniki HTML, aby nie wpływały na wyświetlanie w panelu
-                $consent_text = wp_strip_all_tags($consent['text']);
-                $consent_status = !empty($consent['accepted']) 
-                    ? _x('Accepted ✅', 'Consent status', 'wc-dynamic-consents') 
-                    : _x('Not Accepted ❌', 'Consent status', 'wc-dynamic-consents');
-    
-                echo '<li><strong>' . esc_html($consent_text) . ':<br></strong> ' . esc_html($consent_status) . '</li>';
-            }
-            echo '</ul>';
-        }
-    }
 }
-
-
-// 

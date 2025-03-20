@@ -2,13 +2,13 @@
 /**
  * WooCommerce Dynamic Checkout Consents - Loader
  *
- * Ładuje wymagane pliki i inicjalizuje główną klasę wtyczki.
+ * Loads required files and initializes the main plugin class.
  *
  * @package WooCommerceDynamicCheckoutConsents
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Zabezpieczenie przed bezpośrednim dostępem
+    exit; // Exit if accessed directly
 }
 
 class WC_Dynamic_Consents_Loader {
@@ -21,7 +21,7 @@ class WC_Dynamic_Consents_Loader {
     private static $instance = null;
 
     /**
-     * Pobiera instancję singletona.
+     * Get the singleton instance.
      *
      * @return WC_Dynamic_Consents_Loader
      */
@@ -51,31 +51,29 @@ class WC_Dynamic_Consents_Loader {
     }
 
     /**
-     * Ładowanie wymaganych plików.
+     * Load required files.
      */
     private function includes() {
         require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents.php';
-        require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-db.php';
-        require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-activator.php';
+        // require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-activator.php';
         require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-helper.php';
-        require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-admin.php';
-        require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-settings.php';
+        require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-admin-definer.php';
+        require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-admin-display.php';
     }
 
     /**
-     * Rejestracja akcji i filtrów.
+     * Register actions and filters.
      */
     private function init_hooks() {
-        // add_action('plugins_loaded', array($this, 'init_plugin'));
         register_activation_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, array('WC_Dynamic_Consents_Activator', 'activate'));
         register_deactivation_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, array('WC_Dynamic_Consents_Activator', 'deactivate'));
+        register_uninstall_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, array('WC_Dynamic_Consents_Activator', 'uninstall'));
     }
 
     /**
-     * Inicjalizacja głównej klasy wtyczki.
+     * Initialize the main plugin class.
      */
     public function init_plugin() {
         WC_Dynamic_Consents::get_instance();
     }
 }
-
