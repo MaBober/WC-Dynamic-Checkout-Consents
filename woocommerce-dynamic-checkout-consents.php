@@ -39,7 +39,8 @@ define('WC_DYNAMIC_CONSENTS_PLUGIN_FILE', __FILE__);
 require_once plugin_dir_path(__FILE__) . 'includes/core/class-wc-dynamic-consents-loader.php';
 
 function wc_dynamic_checkout_consents_init() {
-    
+
+    error_log("MAIN - wc_dynamic_checkout_consents_init");
     WC_Dynamic_Consents_Loader::get_instance();
 
 }
