@@ -6,12 +6,12 @@
  * Version: 1.0.0
  * Requires at least: 5.0
  * Requires PHP: 7.4
- * Requires Plugins: WooCommerce
+ * Requires Plugins: woocommerce
  * Author: Marcin Bober
  * Author URI: https://www.marcin.bober.pl
  * License: GPL-2.0+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: wc-dynamic-consents
+ * Text Domain: WC-Dynamic-Checkout-Consents
  * Domain Path: /languages
 
  *  
