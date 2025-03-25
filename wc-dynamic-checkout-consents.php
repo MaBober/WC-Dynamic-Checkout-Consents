@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WC Dynamic Checkout Consents
- * Plugin URI: https://www.marcin.bober.pl
+ * Plugin URI: https://github.com/MaBober/WC-Dynamic-Checkout-Consents
  * Description: Add dynamic consents to WooCommerce checkout.
  * Version: 1.0.0
  * Requires at least: 5.0
