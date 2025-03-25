@@ -11,7 +11,7 @@
  * Author URI: https://www.marcin.bober.pl
  * License: GPL-2.0+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: WC-Dynamic-Checkout-Consents
+ * Text Domain: wc-dynamic-checkout-consents
  * Domain Path: /languages
 
  *  
