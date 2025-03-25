@@ -1,29 +1,37 @@
 <?php
+
 /**
  * WooCommerce Dynamic Checkout Consents - Loader
  *
- * Ładuje wymagane pliki i inicjalizuje główną klasę wtyczki.
+ * Handles loading required files and initializing the main plugin class.
  *
- * @package WooCommerceDynamicCheckoutConsents
+ * @package WCDynamicCheckoutConsents
  */
 
 if (!defined('ABSPATH')) {
     exit; // Zabezpieczenie przed bezpośrednim dostępem
 }
 
+/**
+ * Class WC_Dynamic_Consents_Loader
+ *
+ * Ensures the plugin loads required dependencies and initializes correctly.
+ */
 class WC_Dynamic_Consents_Loader {
 
     /**
      * Singleton instance
      *
-     * @var WC_Dynamic_Consents_Loader
+     * @var WC_Dynamic_Consents_Loader|null
      */
     private static $instance = null;
 
     /**
-     * Pobiera instancję singletona.
+     * Returns the singleton instance of the loader.
      *
-     * @return WC_Dynamic_Consents_Loader
+     * Prevents unnecessary initialization in cases like favicon requests or cron jobs.
+     *
+     * @return WC_Dynamic_Consents_Loader|null
      */
     public static function get_instance() {
         
@@ -32,7 +40,7 @@ class WC_Dynamic_Consents_Loader {
             strpos($request_uri, 'favicon.ico') !== false ||
             (defined('DOING_CRON') && DOING_CRON)
         ) {
-            return;
+            return null;
         }
 
         if (self::$instance === null) {
@@ -43,36 +51,29 @@ class WC_Dynamic_Consents_Loader {
 
     /**
      * WC_Dynamic_Consents_Loader constructor.
+     *
+     * Initializes the plugin by including necessary files and setting up hooks.
      */
     private function __construct() {
         $this->includes();
-        $this->init_hooks();
+
         $this->init_plugin();
     }
 
     /**
-     * Ładowanie wymaganych plików.
+     * Includes required files for the plugin.
      */
     private function includes() {
         require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents.php';
-        require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-db.php';
-        require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-activator.php';
         require_once plugin_dir_path(__FILE__) . 'class-wc-dynamic-consents-helper.php';
-        require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-admin.php';
+        require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-order.php';
         require_once plugin_dir_path(__FILE__) . '../admin/class-wc-dynamic-consents-settings.php';
+        require_once plugin_dir_path(__FILE__) . '../frontend/class-wc-dynamic-consents-frontend.php';
     }
 
-    /**
-     * Rejestracja akcji i filtrów.
-     */
-    private function init_hooks() {
-        // add_action('plugins_loaded', array($this, 'init_plugin'));
-        register_activation_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, array('WC_Dynamic_Consents_Activator', 'activate'));
-        register_deactivation_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, array('WC_Dynamic_Consents_Activator', 'deactivate'));
-    }
 
     /**
-     * Inicjalizacja głównej klasy wtyczki.
+     * Initializes the main plugin class.
      */
     public function init_plugin() {
         WC_Dynamic_Consents::get_instance();
