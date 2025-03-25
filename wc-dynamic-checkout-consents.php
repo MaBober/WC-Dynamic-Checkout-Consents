@@ -1,26 +1,23 @@
 <?php
 /**
- * Plugin Name: WooCommerce Dynamic Checkout Consents
+ * Plugin Name: WC Dynamic Checkout Consents
  * Plugin URI: https://www.marcin.bober.pl
  * Description: Add dynamic consents to WooCommerce checkout.
  * Version: 1.0.0
  * Requires at least: 5.0
  * Requires PHP: 7.4
- * Requires Plugins: woocommerce
+ * Requires Plugins: WooCommerce
  * Author: Marcin Bober
  * Author URI: https://www.marcin.bober.pl
  * License: GPL-2.0+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wc-dynamic-consents
  * Domain Path: /languages
- * Requires Plugins: WooCommerce
+
  *  
- * @package WooCommerceDynamicCheckoutConsents
+ * @package WCDynamicCheckoutConsents
  * @category WooCommerce
- * Author: Marcin Bober
- * License: GPL-2.0+
- * Link: https://www.marcin.bober.pl
- * Since: 1.0.0
+ * @since 1.0.0
  *
  * This plugin allows you to add dynamic consents to the WooCommerce checkout page.
  * You can define multiple consents that customers need to accept before placing an order.
@@ -37,12 +34,13 @@ if (!defined('ABSPATH')) {
 define('WC_DYNAMIC_CONSENTS_PLUGIN_FILE', __FILE__);
 
 require_once plugin_dir_path(__FILE__) . 'includes/core/class-wc-dynamic-consents-loader.php';
+require_once plugin_dir_path(__FILE__) . 'includes/core/class-wc-dynamic-consents-activator.php';
+
+register_activation_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, ['WC_Dynamic_Consents_Activator', 'activate']);
+register_deactivation_hook(WC_DYNAMIC_CONSENTS_PLUGIN_FILE, ['WC_Dynamic_Consents_Activator', 'deactivate']);
 
 function wc_dynamic_checkout_consents_init() {
-
-    error_log("MAIN - wc_dynamic_checkout_consents_init");
     WC_Dynamic_Consents_Loader::get_instance();
-
 }
-add_action('plugins_loaded', 'wc_dynamic_checkout_consents_init');
 
+add_action('plugins_loaded', 'wc_dynamic_checkout_consents_init');

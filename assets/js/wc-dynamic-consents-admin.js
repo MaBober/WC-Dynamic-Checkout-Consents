@@ -2,10 +2,16 @@ jQuery(function ($) {
     const categories = wcDynamicConsentsData.categories;
     const products = wcDynamicConsentsData.products;
 
+    /**
+     * Removes a consent row from the table.
+     */
     $('#dynamic-consents-table').on('click', '.remove-consent', function () {
         $(this).closest('tr').remove();
     });
 
+    /**
+     * Adds a new consent row to the table.
+     */
     $('.add-consent').on('click', function () {
         const table = $('#dynamic-consents-table tbody');
         const rowCount = table.find('tr').length;
@@ -16,10 +22,13 @@ jQuery(function ($) {
         const newElement = $(newRow);
         table.append(newElement);
 
-        // 🔹 Automatycznie wywołujemy zmianę, żeby odświeżyć drugi select
+        // Trigger change to refresh the second select dropdown
         newElement.find('.consent-type').trigger('change');
     });
 
+    /**
+     * Adds a new condition for a consent (e.g., for a product/category).
+     */
     $('#dynamic-consents-table').on('click', '.add-condition', function () {
         const conditionsWrapper = $(this).siblings('.consent-conditions');
         const consentIndex = $(this).closest('tr').index();
@@ -32,15 +41,20 @@ jQuery(function ($) {
         const newCondition = $(conditionTemplate);
         conditionsWrapper.append(newCondition);
 
-        // 🔹 Wywołujemy zmianę po dodaniu nowego warunku
+        //  Trigger change event after adding a new condition
         newCondition.find('.consent-type').trigger('change');
     });
 
+    /**
+     * Removes a condition from a consent.
+     */
     $('#dynamic-consents-table').on('click', '.remove-condition', function () {
         $(this).closest('.consent-condition').remove();
     });
 
-    // 🔹 Dynamiczne aktualizowanie drugiego selecta po zmianie pierwszego
+    /**
+     * Updates the second `select` dropdown based on the first `select` selection.
+     */
     $('#dynamic-consents-table').on('change', '.consent-type', function () {
         const type = $(this).val();
         const targetSelect = $(this).siblings('.consent-target');
@@ -60,8 +74,11 @@ jQuery(function ($) {
         }
     });
 
-    // 🔹 Odświeżenie wszystkich warunków po załadowaniu strony
+    /**
+     *  Refreshes all conditions on page load to ensure `select` elements are correctly populated.
+     */
     $('.consent-type').each(function () {
         $(this).trigger('change');
     });
 });
+s
